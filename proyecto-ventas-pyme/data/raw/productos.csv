@@ -1,0 +1,26 @@
+﻿producto_id,producto,categoria,costo_base,precio_lista
+1,Teclado,Tecnologia,29062.66,36764.45
+2,Mouse,Tecnologia,12956.3,17930.57
+3,Auriculares,Tecnologia,33352.03,55231.62
+4,Monitor,Tecnologia,40234.34,52391.68
+5,Webcam,Tecnologia,19448.94,24658.89
+6,Cuaderno,Oficina,10463.8,16252.51
+7,Agenda,Oficina,1972.89,2701.48
+8,Lapicera,Oficina,29524.89,46559.71
+9,Resaltador,Oficina,10543.48,16907.1
+10,Carpeta,Oficina,36576.83,45863.66
+11,Lampara,Hogar,36417.21,60776.09
+12,Organizador,Hogar,15839.07,21276.43
+13,Botella,Hogar,43108.82,62592.14
+14,Taza,Hogar,4899.37,6408.52
+15,Almohadon,Hogar,38259.25,61682.93
+16,Mochila,Accesorios,36475.07,61564.05
+17,Soporte notebook,Accesorios,24501.28,44932.15
+18,Cable USB,Accesorios,17531.22,27720.79
+19,Cargador,Accesorios,37459.69,60726.35
+20,Funda,Accesorios,38887.44,62080.35
+21,Libro,Libreria,31942.08,40805.84
+22,Calculadora,Libreria,10873.1,15479.3
+23,Regla,Libreria,4326.81,6012.86
+24,Tijera,Libreria,5264.26,7458.32
+25,Notas adhesivas,Libreria,28897.25,42447.15

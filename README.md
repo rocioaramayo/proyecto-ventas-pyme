@@ -13,3 +13,12 @@ para encontrar oportunidades de mejora.
 4. ¿Qué sucursales funcionan mejor?
 5. ¿Cuántos clientes vuelven a comprar?
 6. ¿Qué efecto tienen los descuentos?
+
+## Limpieza realizada
+
+- Eliminación de registros duplicados.
+- Conversión y validación de fechas.
+- Conversión de columnas numéricas.
+- Validación de cantidades y precios.
+- Eliminación de descuentos fuera del rango permitido.
+- Revisión de valores nulos.
