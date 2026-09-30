@@ -7,7 +7,7 @@ Proyecto de portfolio orientado a un puesto de Data Analyst Jr. El objetivo es t
 - [x] Generación de un conjunto de datos sintético.
 - [x] Exploración, limpieza y validación con Python y pandas.
 - [x] Documentación de las tablas.
-- [ ] Análisis con SQL.
+- [x] Base SQLite y análisis con SQL.
 - [ ] Modelo, medidas y dashboard en Power BI.
 - [ ] Conclusiones comerciales y capturas finales.
 
@@ -32,10 +32,11 @@ proyecto-ventas-pyme/
 ├── docs/                    # Diccionario de datos
 ├── images/                  # Futuras capturas del dashboard
 ├── powerbi/                 # Futuro archivo .pbix
-├── sql/                     # Futuras consultas SQL
+├── sql/                     # Esquema y consultas SQL
 └── src/
     ├── generar_datos.py     # Genera datos sintéticos reproducibles
-    └── limpieza.py          # Convierte, valida, filtra y documenta errores
+    ├── limpieza.py          # Convierte, valida, filtra y documenta errores
+    └── cargar_sqlite.py     # Construye la base SQLite y carga las tablas
 ```
 
 ## Calidad y limpieza
@@ -66,14 +67,29 @@ cd "C:\Users\rocio\OneDrive\Desktop\dataScience\Proyecto1\proyecto-ventas-pyme"
 python -m pip install pandas
 python src/generar_datos.py
 python src/limpieza.py
+python src/cargar_sqlite.py
 ```
 
 ## Archivos resultantes
 
 - `data/processed/ventas_limpias.csv`: tabla de ventas lista para analizar.
 - `data/processed/resumen_limpieza.csv`: cantidad de problemas detectados por control.
+- `data/processed/ventas_pyme.db`: base SQLite con el modelo relacional.
 - `docs/diccionario_datos.md`: definición de campos y relaciones.
+- `docs/machete_sql.md`: explicación de los conceptos SQL utilizados.
+- `sql/analisis_ventas.sql`: consultas y preguntas de negocio.
+
+## Primeros resultados SQL
+
+- Ventas válidas analizadas: **1.195**.
+- Facturación total: **$182.490.551,03**.
+- Margen total: **$50.098.827,98**.
+- Ticket promedio: **$152.711,76**.
+- Categoría con mayor facturación: **Accesorios**.
+- Sucursal con mayor facturación: **Online**.
+
+Estos resultados se utilizarán como referencia para comprobar las medidas de Power BI.
 
 ## Próxima etapa
 
-Crear las consultas SQL y construir en Power BI un modelo estrella con tabla calendario, medidas DAX y un dashboard ejecutivo.
+Construir en Power BI un modelo estrella con tabla calendario, medidas DAX y un dashboard ejecutivo.
