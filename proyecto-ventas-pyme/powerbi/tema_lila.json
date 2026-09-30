@@ -1,0 +1,52 @@
+{
+  "name": "Rocio Data Analytics",
+  "dataColors": [
+    "#9B72B0",
+    "#C5AECF",
+    "#6F4E7C",
+    "#D8C8DF",
+    "#7A8FB8",
+    "#D6A77A",
+    "#6E9B8B",
+    "#B86F7D"
+  ],
+  "background": "#F7F2EC",
+  "foreground": "#3F3346",
+  "tableAccent": "#9B72B0",
+  "good": "#3E8E73",
+  "neutral": "#D6A77A",
+  "bad": "#B85C6B",
+  "maximum": "#6F4E7C",
+  "center": "#C5AECF",
+  "minimum": "#F7F2EC",
+  "null": "#D9D3DA",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 12,
+            "color": {
+              "solid": {
+                "color": "#3F3346"
+              }
+            }
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}

@@ -78,6 +78,9 @@ python src/cargar_sqlite.py
 - `docs/diccionario_datos.md`: definición de campos y relaciones.
 - `docs/machete_sql.md`: explicación de los conceptos SQL utilizados.
 - `sql/analisis_ventas.sql`: consultas y preguntas de negocio.
+- `powerbi/medidas_dax.txt`: tabla calendario y medidas del dashboard.
+- `powerbi/tema_lila.json`: tema visual personalizado.
+- `powerbi/guia_dashboard.md`: construcción paso a paso del informe.
 
 ## Primeros resultados SQL
 

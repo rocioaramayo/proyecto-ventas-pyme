@@ -1,0 +1,85 @@
+-- Crear estas medidas dentro de la tabla FactVentas.
+
+Facturación =
+SUMX(
+    FactVentas,
+    FactVentas[cantidad]
+        * FactVentas[precio_unitario]
+        * (1 - FactVentas[descuento])
+)
+
+Venta bruta =
+SUMX(
+    FactVentas,
+    FactVentas[cantidad] * FactVentas[precio_unitario]
+)
+
+Importe descontado =
+[Venta bruta] - [Facturación]
+
+Costo total =
+SUMX(
+    FactVentas,
+    FactVentas[cantidad] * FactVentas[costo_unitario]
+)
+
+Margen =
+[Facturación] - [Costo total]
+
+Margen % =
+DIVIDE([Margen], [Facturación], 0)
+
+Unidades vendidas =
+SUM(FactVentas[cantidad])
+
+Cantidad de ventas =
+DISTINCTCOUNT(FactVentas[venta_id])
+
+Ticket promedio =
+DIVIDE([Facturación], [Cantidad de ventas], 0)
+
+Clientes activos =
+DISTINCTCOUNT(FactVentas[cliente_id])
+
+Facturación mes anterior =
+CALCULATE(
+    [Facturación],
+    DATEADD(DimFecha[Fecha], -1, MONTH)
+)
+
+Crecimiento mensual =
+[Facturación] - [Facturación mes anterior]
+
+Crecimiento mensual % =
+DIVIDE(
+    [Crecimiento mensual],
+    [Facturación mes anterior]
+)
+
+Participación en ventas % =
+DIVIDE(
+    [Facturación],
+    CALCULATE([Facturación], ALL(DimProducto)),
+    0
+)
+
+-- Crear esta tabla desde Modelado > Nueva tabla.
+
+DimFecha =
+ADDCOLUMNS(
+    CALENDAR(
+        MIN(FactVentas[fecha]),
+        MAX(FactVentas[fecha])
+    ),
+    "Año", YEAR([Date]),
+    "Mes número", MONTH([Date]),
+    "Mes", FORMAT([Date], "MMMM"),
+    "Año-Mes", FORMAT([Date], "YYYY-MM"),
+    "Inicio de mes", DATE(YEAR([Date]), MONTH([Date]), 1),
+    "Trimestre", "T" & QUARTER([Date])
+)
+
+-- Después de crear DimFecha:
+-- 1. Renombrar la columna Date como Fecha.
+-- 2. Ordenar DimFecha[Mes] por DimFecha[Mes número].
+-- 3. Marcar DimFecha como tabla de fechas usando DimFecha[Fecha].
