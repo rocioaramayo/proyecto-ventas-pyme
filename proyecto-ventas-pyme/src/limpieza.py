@@ -8,70 +8,99 @@ CARPETA_RAW = RAIZ / "data" / "raw"
 CARPETA_PROCESSED = RAIZ / "data" / "processed"
 CARPETA_PROCESSED.mkdir(parents=True, exist_ok=True)
 
-# 1. Cargar archivos
-ventas = pd.read_csv(CARPETA_RAW / "ventas.csv")
-productos = pd.read_csv(CARPETA_RAW / "productos.csv")
-clientes = pd.read_csv(CARPETA_RAW / "clientes.csv")
-sucursales = pd.read_csv(CARPETA_RAW / "sucursales.csv")
 
-# 2. Explorar los datos
-print("Primeras filas:")
-print(ventas.head())
+def cargar_datos() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Carga la tabla de ventas y las tres tablas maestras."""
+    ventas = pd.read_csv(CARPETA_RAW / "ventas.csv")
+    productos = pd.read_csv(CARPETA_RAW / "productos.csv")
+    clientes = pd.read_csv(CARPETA_RAW / "clientes.csv")
+    sucursales = pd.read_csv(CARPETA_RAW / "sucursales.csv")
+    return ventas, productos, clientes, sucursales
 
-print("\nInformación general:")
-ventas.info()
 
-print("\nValores nulos:")
-print(ventas.isna().sum())
+def validar_clave_maestra(tabla: pd.DataFrame, clave: str, nombre: str) -> None:
+    """Detiene el proceso si una dimensión tiene claves vacías o repetidas."""
+    if tabla[clave].isna().any():
+        raise ValueError(f"La tabla {nombre} contiene valores nulos en {clave}.")
 
-print("\nDuplicados:")
-print(ventas.duplicated().sum())
+    if tabla[clave].duplicated().any():
+        raise ValueError(f"La tabla {nombre} contiene valores repetidos en {clave}.")
 
-print("\nDescripción de cantidad:")
-print(ventas["cantidad"].describe())
 
-print("\nDescripción de precios:")
-print(ventas["precio_unitario"].describe())
+def main() -> None:
+    ventas, productos, clientes, sucursales = cargar_datos()
+    filas_originales = len(ventas)
 
-print("\nDescripción de descuentos:")
-print(ventas["descuento"].describe())
+    # Las claves de las tablas maestras deben identificar una sola fila.
+    validar_clave_maestra(productos, "producto_id", "productos")
+    validar_clave_maestra(clientes, "cliente_id", "clientes")
+    validar_clave_maestra(sucursales, "sucursal_id", "sucursales")
 
-# 3. Limpiar
-ventas = ventas.drop_duplicates()
+    # errors="coerce" transforma valores imposibles en nulos para detectarlos.
+    ventas["fecha"] = pd.to_datetime(ventas["fecha"], errors="coerce")
 
-ventas["fecha"] = pd.to_datetime(
-    ventas["fecha"],
-    errors="coerce"
-)
+    columnas_numericas = [
+        "cantidad",
+        "precio_unitario",
+        "descuento",
+        "costo_unitario",
+    ]
+    for columna in columnas_numericas:
+        ventas[columna] = pd.to_numeric(ventas[columna], errors="coerce")
 
-ventas["cantidad"] = pd.to_numeric(
-    ventas["cantidad"],
-    errors="coerce"
-)
+    # Cada máscara es una serie de True/False: True significa "hay un problema".
+    problemas = {
+        "filas_duplicadas": ventas.duplicated(keep="first"),
+        "fechas_invalidas": ventas["fecha"].isna(),
+        "cantidades_invalidas": ventas["cantidad"].isna()
+        | (ventas["cantidad"] <= 0),
+        "precios_invalidos": ventas["precio_unitario"].isna()
+        | (ventas["precio_unitario"] <= 0),
+        "descuentos_invalidos": ventas["descuento"].isna()
+        | ~ventas["descuento"].between(0, 1),
+        "costos_invalidos": ventas["costo_unitario"].isna()
+        | (ventas["costo_unitario"] <= 0),
+        "productos_inexistentes": ~ventas["producto_id"].isin(
+            productos["producto_id"]
+        ),
+        "clientes_inexistentes": ~ventas["cliente_id"].isin(
+            clientes["cliente_id"]
+        ),
+        "sucursales_inexistentes": ~ventas["sucursal_id"].isin(
+            sucursales["sucursal_id"]
+        ),
+    }
 
-ventas["precio_unitario"] = pd.to_numeric(
-    ventas["precio_unitario"],
-    errors="coerce"
-)
+    # Una fila se elimina si presenta por lo menos uno de los problemas anteriores.
+    fila_invalida = pd.Series(False, index=ventas.index)
+    for mascara in problemas.values():
+        fila_invalida = fila_invalida | mascara
 
-ventas["descuento"] = pd.to_numeric(
-    ventas["descuento"],
-    errors="coerce"
-)
+    ventas_limpias = ventas.loc[~fila_invalida].copy()
+    ventas_limpias["fecha"] = ventas_limpias["fecha"].dt.strftime("%Y-%m-%d")
 
-ventas = ventas[
-    (ventas["cantidad"] > 0)
-    & (ventas["precio_unitario"] > 0)
-    & (ventas["descuento"].between(0, 1))
-    & (ventas["fecha"].notna())
-]
+    ruta_ventas = CARPETA_PROCESSED / "ventas_limpias.csv"
+    ventas_limpias.to_csv(ruta_ventas, index=False)
 
-# 4. Guardar resultado
-ventas.to_csv(
-    CARPETA_PROCESSED / "ventas_limpias.csv",
-    index=False
-)
+    resumen = [
+        {"metrica": "filas_originales", "cantidad": filas_originales},
+        *[
+            {"metrica": nombre, "cantidad": int(mascara.sum())}
+            for nombre, mascara in problemas.items()
+        ],
+        {"metrica": "filas_eliminadas", "cantidad": int(fila_invalida.sum())},
+        {"metrica": "filas_finales", "cantidad": len(ventas_limpias)},
+    ]
+    ruta_resumen = CARPETA_PROCESSED / "resumen_limpieza.csv"
+    pd.DataFrame(resumen).to_csv(ruta_resumen, index=False)
 
-print("\nLimpieza terminada.")
-print(f"Filas finales: {len(ventas)}")
-print("Archivo creado: data/processed/ventas_limpias.csv")
+    print("Limpieza y validación terminadas.")
+    print(f"Filas originales: {filas_originales}")
+    print(f"Filas eliminadas: {int(fila_invalida.sum())}")
+    print(f"Filas finales: {len(ventas_limpias)}")
+    print(f"Ventas limpias: {ruta_ventas}")
+    print(f"Resumen: {ruta_resumen}")
+
+
+if __name__ == "__main__":
+    main()
