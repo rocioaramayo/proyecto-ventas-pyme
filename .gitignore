@@ -1,5 +1,8 @@
 __pycache__/
 *.py[cod]
+.venv/
+venv/
+.env
 
 # Copia local temporal mantenida abierta por Power BI durante la reorganización.
 /proyecto-ventas-pyme/
